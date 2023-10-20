@@ -1,0 +1,20 @@
+<script src="bookScript.js"></script>
+<link rel="stylesheet" href="styles.css">
+<body onload="loadBooks()" id="main" style="background-color: #362976;">
+<div style="padding-bottom: 100px; background-color: #362976;">
+	<a href="bookRankings.html" style=" text-decoration: none; padding-top:5px; padding-bottom:5px; padding-left:15px; padding-right:15px; color: #A392F3;">RoyalRoad</a>
+	<a href="nuRankings.html" style=" text-decoration: none; padding-top:5px; padding-bottom:5px; padding-left:15px; padding-right:15px; color: #A392F3;">NU</a>
+</div>
+<div style="padding-bottom: 20px;">
+	<button style="padding:15px; padding-bottom: 3px; padding-top: 3px; background-color: #42a7f5; border: none; margin-left: 50px; border-radius: 2px; font-size: 13px;" onclick="switchFilterState()">Filter</button>
+	<form style="margin-top: 25px; margin-left: 50px; margin-right: 50px; background-color: #5d4ea9; padding: 25px; width: 60%;" id="filterForm">
+		
+		<div id="genresCheck">
+			<b>genres:</b>  <br>
+		</div>
+		<!-- pages: <input type="text"></input> <br> -->
+		<!-- include completed books: <input type="text"></input> -->
+		
+	</form>
+</div>
+</body>

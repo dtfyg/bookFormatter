@@ -1,0 +1,8 @@
+amount:250|
+
+rating:4.5|
+
+page:1000|
+
+updateFreq:1|
+
