@@ -2,10 +2,12 @@ import array
 import string
 import sys
 from urllib import request
+from bs4 import BeautifulSoup 
 from urllib.request import Request, urlopen
 import html
 import time
 import grequests
+import requests
 import re
 import pymongo
 import time;
@@ -150,7 +152,7 @@ def formatBook(content, savedData):
     firstTag = content[genreStart:firstEnd]
     tagsArray.append(firstTag)
     genreStart = firstEnd + len('</span>')
-    totalGenreEnd = content.find('</span>', genreStart)
+    totalGenreEnd = content.find('<label for="', genreStart)
     totalGenre = content[genreStart:totalGenreEnd]
     #next genres
     while totalGenre.find('<a class="label label-default label-sm bg-blue-dark fiction-tag" href=', genreStart) > 0:
@@ -217,13 +219,18 @@ def getSummary():
         n = n + 1
     links.append('https://www.royalroad.com/fictions/trending')
     totalformattime = 0
-    multiLinks = (grequests.get(u) for u in links)
-    for i, resp in enumerate(grequests.map(multiLinks)):
+    head = {"User-Agent": "Mozilla/5.0 (X11; CrOS x86_64 12871.102.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.141 Safari/537.36"}
+    grequests
+    multiLinks = (grequests.get(u, headers=head) for u in links)
+    for i, resp in enumerate(grequests.map(multiLinks, size=10)):
         try:
+            # soup = BeautifulSoup(resp.content, 'html5lib')
+            # print(soup)
             formatPage(resp.text, oldData)
         except:
-            print("Error\n")
-            print("Error link: " + links[i])
+            print("Error, no text found.\n")
+            # print("Error link: " + links[i])
+           
         
     
 
