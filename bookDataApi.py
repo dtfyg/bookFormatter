@@ -139,6 +139,8 @@ class filterObj(BaseModel):
     pages: int
     rating: float
     read: bool
+    sort_by: str 
+    sort_order: int 
 
 @app.post("/getFilterBooks/")
 async def getFiltered(item: filterObj):
@@ -150,13 +152,26 @@ async def getFiltered(item: filterObj):
      read = { '$exists': True}
   else:
      read = False
-  
-  if len(item.genre) > 0:
-      filterQuery = {"genre": {'$all': item.genre}, "pages": {'$gte': item.pages}, "rating": {'$gte': item.rating}, "read": read}
-  else:
-      filterQuery = {"pages": {'$gte': item.pages}, "rating": {'$gte': item.rating}, "read": read}
-  
-  for x in collection.find(filterQuery):
+  filterQuery = {
+        "pages": {'$gte': item.pages},
+        "rating": {'$gte': item.rating},
+        "read": read
+    }
+  if item.genre:
+     filterQuery["genre"] = {'$all': item.genre}
+#   if len(item.genre) > 0:
+#       filterQuery = {"genre": {'$all': item.genre}, "pages": {'$gte': item.pages}, "rating": {'$gte': item.rating}, "read": read}
+#   else:
+#       filterQuery = {"pages": {'$gte': item.pages}, "rating": {'$gte': item.rating}, "read": read}
+  sortCriteria = []
+  if item.sort_by:
+     sortCriteria = [(item.sort_by, item.sort_order)]
+
+    # MongoDB find with optional sort
+  cursor = collection.find(filterQuery)
+  if sortCriteria:
+     cursor = cursor.sort(sortCriteria)
+  for x in cursor:
       currName = x["name"]
       currCh = x["chapters"]
       currGenre = x["genre"]

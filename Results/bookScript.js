@@ -95,10 +95,10 @@ function getCheckedElements() {
     } else {
         completedValue = false;
     }
-    loadFilterBooks(results, document.getElementById("pagesInput").value, document.getElementById("ratingInput").value, completedValue);
+    loadFilterBooks(results, document.getElementById("pagesInput").value, document.getElementById("ratingInput").value, completedValue, document.getElementById("sortBy").value);
 }
 
-function loadFilterBooks(genres = [], pages = 0, rating = 0, read = false) {
+function loadFilterBooks(genres = [], pages = 0, rating = 0, read = false, sortby = "rating") {
     if (rating == "") {
         rating = 0;
     }
@@ -108,7 +108,7 @@ function loadFilterBooks(genres = [], pages = 0, rating = 0, read = false) {
     var xhttp = new XMLHttpRequest();
     xhttp.open("POST", "http://127.0.0.1:8000/getFilterBooks/", false);
     xhttp.setRequestHeader("Content-Type", "application/json");
-    xhttp.send(JSON.stringify({ "genre": genres, "pages": pages, "rating": rating, "read": read }));
+    xhttp.send(JSON.stringify({ "genre": genres, "pages": pages, "rating": rating, "read": read, "sort_by": sortby, "sort_order": -1 }));
     var currentBooks = document.getElementById("booksDiv");
     currentBooks.remove();
     generateBooks(xhttp.responseText);
@@ -169,6 +169,23 @@ function genFilterTab() {
     completedLabel.appendChild(document.createTextNode("Include completed books"));
     form.appendChild(completedLabel);
     form.appendChild(completed);
+    form.appendChild(addLineBreak());
+
+    //sort button
+    var sortLabel = document.createElement("label");
+    sortLabel.appendChild(document.createTextNode("Sort  "));
+    form.appendChild(sortLabel);
+    var selectArr = ["rating", "pages"];
+    var selectList = document.createElement("select");
+    selectList.id = "sortBy";
+    for (var i = 0; i < selectArr.length; i++) {
+        var option = document.createElement("option");
+        option.value = selectArr[i];
+        option.text = selectArr[i];
+        selectList.appendChild(option);
+    }
+    form.appendChild(selectList);
+    form.appendChild(addLineBreak());
     form.appendChild(addLineBreak());
     
     //<button onclick="getCheckedElements()" type="button">filter</button>
