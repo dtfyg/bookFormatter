@@ -95,10 +95,10 @@ function getCheckedElements() {
     } else {
         completedValue = false;
     }
-    loadFilterBooks(results, document.getElementById("pagesInput").value, document.getElementById("ratingInput").value, completedValue, document.getElementById("sortBy").value);
+    loadFilterBooks(results, document.getElementById("pagesInput").value, document.getElementById("ratingInput").value, completedValue, document.getElementById("sortBy").value, document.getElementById("sortOrder").value);
 }
 
-function loadFilterBooks(genres = [], pages = 0, rating = 0, read = false, sortby = "rating") {
+function loadFilterBooks(genres = [], pages = 0, rating = 0, read = false, sortby = "rating", sortOrder = -1) {
     if (rating == "") {
         rating = 0;
     }
@@ -108,7 +108,7 @@ function loadFilterBooks(genres = [], pages = 0, rating = 0, read = false, sortb
     var xhttp = new XMLHttpRequest();
     xhttp.open("POST", "http://127.0.0.1:8000/getFilterBooks/", false);
     xhttp.setRequestHeader("Content-Type", "application/json");
-    xhttp.send(JSON.stringify({ "genre": genres, "pages": pages, "rating": rating, "read": read, "sort_by": sortby, "sort_order": -1 }));
+    xhttp.send(JSON.stringify({ "genre": genres, "pages": pages, "rating": rating, "read": read, "sort_by": sortby, "sort_order": sortOrder }));
     var currentBooks = document.getElementById("booksDiv");
     currentBooks.remove();
     generateBooks(xhttp.responseText);
@@ -133,28 +133,33 @@ function genFilterTab() {
     form.style.display = "none";
 
     lineBreak = 0;
-    // rating: <input type="text"></input> <br></br>
+
     // rating label for filter
+    form.appendChild(addLineBreak());
     var ratingInput = document.createElement("input");
     ratingInput.type = "text";
     ratingInput.size = 5;
     ratingInput.id = "ratingInput";
     var ratingLabel = document.createElement("label");
-    ratingLabel.appendChild(document.createTextNode("Rating"));
+    ratingLabel.appendChild(document.createTextNode("Rating "));
     form.appendChild(ratingLabel);
     form.appendChild(ratingInput);
     form.appendChild(addLineBreak());
+    form.appendChild(addLineBreak());
 
+    // pages filter
     var pagesInput = document.createElement("input");
     pagesInput.type = "text";
     pagesInput.size = 5;
     pagesInput.id = "pagesInput";
     var pagesLabel = document.createElement("label");
-    pagesLabel.appendChild(document.createTextNode("Pages"));
+    pagesLabel.appendChild(document.createTextNode("Pages "));
     form.appendChild(pagesLabel);
     form.appendChild(pagesInput);
     form.appendChild(addLineBreak());
+    form.appendChild(addLineBreak());
 
+    //option for including completed books
     var completed = document.createElement("select");
     var completedLabel = document.createElement("label");
     completed.id = "completedId";
@@ -166,12 +171,13 @@ function genFilterTab() {
 
     completed.appendChild(optionYes);
     completed.appendChild(optionNo);
-    completedLabel.appendChild(document.createTextNode("Include completed books"));
+    completedLabel.appendChild(document.createTextNode("Include completed  "));
     form.appendChild(completedLabel);
     form.appendChild(completed);
     form.appendChild(addLineBreak());
+    form.appendChild(addLineBreak());
 
-    //sort button
+    //sorting by options
     var sortLabel = document.createElement("label");
     sortLabel.appendChild(document.createTextNode("Sort  "));
     form.appendChild(sortLabel);
@@ -185,11 +191,27 @@ function genFilterTab() {
         selectList.appendChild(option);
     }
     form.appendChild(selectList);
+
+    // sorting order: ascending/descending
+    var sortOrder = document.createElement("select");
+    sortOrder.id = "sortOrder";
+    var asc = document.createElement("option");
+    asc.value = 1;
+    asc.text = "ascending";
+    var des = document.createElement("option");
+    des.value = -1;
+    des.text = "descending";
+    sortOrder.appendChild(asc);
+    sortOrder.appendChild(des);
+    form.appendChild(sortOrder);
+    
+
     form.appendChild(addLineBreak());
     form.appendChild(addLineBreak());
     
     //<button onclick="getCheckedElements()" type="button">filter</button>
     var confirmButton = document.createElement("button");
+    confirmButton.id = "filterConfirm";
     confirmButton.onclick = function () { getCheckedElements(); };
     confirmButton.type = "button";
 
