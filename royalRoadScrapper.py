@@ -152,9 +152,22 @@ def formatBook(content, savedData):
     firstTag = content[genreStart:firstEnd]
     tagsArray.append(firstTag)
     genreStart = firstEnd + len('</span>')
+    #get ongoing/completed/stub
+    genreStart = content.find('<span class="label label-default label-sm bg-blue-hoki" style="overflow: hidden; display: inline-block; padding: 3px 5px;">', genreStart) + len(
+        '<span class="label label-default label-sm bg-blue-hoki" style="overflow: hidden; display: inline-block; padding: 3px 5px;">')
+    
+    firstEnd = content.find('</span>', genreStart)
+    # stub check
+    if (content[genreStart:firstEnd].find('<i class="fas fa-info-circle popovers" data-container="body"')!=-1):
+        firstEnd = content.find('<i class="fas fa-info-circle popovers" data-container="body"', genreStart)
+    secTag = content[genreStart:firstEnd]
+    tagsArray.append(secTag.strip())
+    genreStart = firstEnd + len('</span>')
+    
     totalGenreEnd = content.find('<label for="', genreStart)
     totalGenre = content[genreStart:totalGenreEnd]
     #next genres
+    
     while totalGenre.find('<a class="label label-default label-sm bg-blue-dark fiction-tag" href=', genreStart) > 0:
         genreStart = totalGenre.find('<a class="label label-default label-sm bg-blue-dark fiction-tag" href=', genreStart) + len('<a class="label label-default label-sm bg-blue-dark fiction-tag" href=')
         genreStart = totalGenre.find('>', genreStart) + 1
@@ -328,6 +341,12 @@ elif action == 3:
     # get the execution time
     elapsed_time = et - st
     sys.stdout = sys.stderr
+    bestRatedAr = []
+    popularAr = []
+    TrendingAr = []
+    currentBooks = []
+    currentRead = []
+    genreFilter = []
     print('Execution time:', elapsed_time, 'seconds')
     print('Last updated: ' + datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
 elif action ==  4:

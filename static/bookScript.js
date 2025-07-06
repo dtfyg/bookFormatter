@@ -50,6 +50,7 @@ const Genres = [
     'Steampunk',
     'Strategy',
     'Strong Lead',
+    'STUB',
     'Supernatural',
     'Technologically Engineered',
     'Tragedy',
@@ -66,8 +67,9 @@ function htmlDecode(input) {
 
 function loadBooks() {
     var xhttp = new XMLHttpRequest();
-    xhttp.open("GET", "http://127.0.0.1:8000/getBooks", false);
-    // xhttp.setRequestHeader("Access-Control-Allow-Origin", "*");
+    // xhttp.open("GET", "http://192.168.1.100:8000/getBooks", false);
+    xhttp.open("GET", "/getBooks", false);
+    // 3xhttp.setRequestHeader("Access-Control-Allow-Origin", "*");
     xhttp.send(null);
     generateBooks(xhttp.responseText);
     genFilterTab();
@@ -84,21 +86,27 @@ function getCheckedElements() {
             results.push(inputs[i].name);
         }
     }
-    // console.log(inputs);
-    console.log("pages: " + document.getElementById("pagesInput").value);
-    console.log(results);
-    console.log("rating: " + document.getElementById("ratingInput").value)
-    console.log("completed: " + document.getElementById("completedId").value)
     var completedValue;
-    if (document.getElementById("completedId").value == "yes") {
+    if (document.getElementById("completedId").value == "Yes") {
         completedValue = true;
     } else {
         completedValue = false;
     }
-    loadFilterBooks(results, document.getElementById("pagesInput").value, document.getElementById("ratingInput").value, completedValue, document.getElementById("sortBy").value, document.getElementById("sortOrder").value);
+    var bookMarkedValue;
+    if (document.getElementById("bookmarkInput").value == "Yes") {
+        bookMarkedValue = true;
+    } else {
+        bookMarkedValue = false;
+    }
+    console.log("completed: " + document.getElementById("completedId").value);
+    console.log("bookmarked: " + document.getElementById("bookmarkInput").value);
+    console.log(completedValue);
+    console.log(completedValue);
+   
+    loadFilterBooks(results, document.getElementById("pagesInput").value, document.getElementById("ratingInput").value, completedValue, document.getElementById("sortBy").value, document.getElementById("sortOrder").value, bookMarkedValue);
 }
 
-function loadFilterBooks(genres = [], pages = 0, rating = 0, read = false, sortby = "rating", sortOrder = -1) {
+function loadFilterBooks(genres = [], pages = 0, rating = 0, read = false, sortby = "rating", sortOrder = -1, bookmarked=false) {
     if (rating == "") {
         rating = 0;
     }
@@ -106,9 +114,10 @@ function loadFilterBooks(genres = [], pages = 0, rating = 0, read = false, sortb
         pages = 0;
     }
     var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "http://127.0.0.1:8000/getFilterBooks/", false);
+    // xhttp.open("POST", "http://192.168.1.100:8000/getFilterBooks/", false);
+    xhttp.open("POST", "/getFilterBooks/", false);
     xhttp.setRequestHeader("Content-Type", "application/json");
-    xhttp.send(JSON.stringify({ "genre": genres, "pages": pages, "rating": rating, "read": read, "sort_by": sortby, "sort_order": sortOrder }));
+    xhttp.send(JSON.stringify({ "genre": genres, "pages": pages, "rating": rating, "read": read, "sort_by": sortby, "sort_order": sortOrder, "bookmarked": bookmarked }));
     var currentBooks = document.getElementById("booksDiv");
     currentBooks.remove();
     generateBooks(xhttp.responseText);
@@ -118,10 +127,23 @@ function loadFilterBooks(genres = [], pages = 0, rating = 0, read = false, sortb
 
 function completeBook(bookName) {
     var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "http://127.0.0.1:8000/completeBook/", false);
+    // xhttp.open("POST", "http://192.168.1.100:8000/completeBook/", false);
+    xhttp.open("POST", "/completeBook/", false);
     xhttp.setRequestHeader("Content-Type", "application/json");
     xhttp.send(JSON.stringify({ "book": bookName }));
     // console.log({"book": bookName});
+    // generateBooks(xhttp.responseText);
+    location.reload();
+    return xhttp.responseText;
+}
+
+
+function bookmarkBook(bookName) {
+    var xhttp = new XMLHttpRequest();
+    // xhttp.open("POST", "http://192.168.1.100:8000/bookmark/", false);
+    xhttp.open("POST", "/bookmark/", false);
+    xhttp.setRequestHeader("Content-Type", "application/json");
+    xhttp.send(JSON.stringify({ "book": bookName }));
     // generateBooks(xhttp.responseText);
     location.reload();
     return xhttp.responseText;
@@ -156,6 +178,25 @@ function genFilterTab() {
     pagesLabel.appendChild(document.createTextNode("Pages "));
     form.appendChild(pagesLabel);
     form.appendChild(pagesInput);
+    form.appendChild(addLineBreak());
+    form.appendChild(addLineBreak());
+
+    // bookmarked filter
+    var bookmarkInput = document.createElement("select");
+    bookmarkInput.id = "bookmarkInput";
+
+    var optionYes = document.createElement("option");
+    optionYes.appendChild(document.createTextNode("Yes"));
+    var optionNo = document.createElement("option");
+    optionNo.appendChild(document.createTextNode("No"));
+
+    bookmarkInput.appendChild(optionYes);
+    bookmarkInput.appendChild(optionNo);
+
+    var bookmarkLabel = document.createElement("label");
+    bookmarkLabel.appendChild(document.createTextNode("Bookmarked "));
+    form.appendChild(bookmarkLabel);
+    form.appendChild(bookmarkInput);
     form.appendChild(addLineBreak());
     form.appendChild(addLineBreak());
 
@@ -293,14 +334,17 @@ function generateBooks(bookData) {
         let pages = books[key]["pages"];
         let synopsis = books[key]["synopsis"];
         let chapters = books[key]["chapters"];
-
+        let bookmarked = books[key]["bookmarked"];
+        let note = books[key]["note"]; 
         //Create Div
         const div = document.createElement("div");
         
         if (bookCount % 2 == 0) {
-            div.style.cssText = 'margin-left:50px; margin-right:50px; border:2px solid; border-color:#9b9bed;border-radius: 15px;padding:10px;background-color:#dae8ed';
+            div.classList.add("bookDivs");
+            // div.style.cssText = 'margin-left:50px; margin-right:50px; border:2px solid; width:100%; border-color:#9b9bed;border-radius: 15px;padding:10px;background-color:#dae8ed';
         } else {
-            div.style.cssText = 'margin-left:50px; margin-right:50px; border:2px solid; border-color:#9b9bed;border-radius: 15px;padding:10px;background-color:#acd1ee';
+            div.classList.add("bookDiv2");
+            // div.style.cssText = 'margin-left:50px; margin-right:50px; border:2px solid; width:100%; border-color:#9b9bed;border-radius: 15px;padding:10px;background-color:#acd1ee';
         }
 
         // book number 
@@ -308,7 +352,29 @@ function generateBooks(bookData) {
         var numNode = document.createTextNode("#" + bookCount);
         bookNum.appendChild(numNode);
         div.appendChild(bookNum);
-        div.appendChild(addLineBreak());
+        //div.appendChild(addLineBreak());
+
+        // bookmark button
+        var button = document.createElement("button");
+        button.innerHTML ='<i class="fa-solid fa-bookmark"></i>';
+       
+        button.style.cssText = "color: grey; font-size: 20px;  border: none; border-radius: 10px;";
+        if (bookmarked) {
+            button.style.color = "green";
+        } else {
+            button.onclick = function () { bookmarkBook(name); };
+        }
+        if (bookCount % 2 == 0) {
+            button.style.backgroundColor =  "#dae8ed";
+        } else {
+            button.style.backgroundColor = "#acd1ee";
+        }
+        //console.log("books[key]:", books[key]);
+       
+            
+       
+        //button.appendChild(buttonText);
+        div.appendChild(button);
 
         // book title
         var title = document.createElement("h2");
@@ -355,16 +421,61 @@ function generateBooks(bookData) {
         button.onclick = function () { completeBook(name); };
         button.style.cssText = "background-color: #4CAF50; color:white; padding: 10px; padding-top:5px; padding-bottom:5px; border: none; border-radius: 10px;";
         button.appendChild(buttonText);
-        // var buttonNode = document.createTextNode(synopsis);
-
         div.appendChild(button);
 
+
+        // show note if it exists
+        if (note && note.trim() !== "") {
+            var noteLabel = document.createElement("h4");
+            noteLabel.textContent = "Note / Review:";
+            noteLabel.style.marginTop = "15px";
+            div.appendChild(noteLabel);
+
+            var noteText = document.createElement("p");
+            noteText.textContent = note;
+            noteText.style.cssText = "background-color: #f0f0f0; padding: 10px; border-radius: 8px; white-space: pre-wrap;";
+            div.appendChild(noteText);
+        } else {
+            // note/review textarea
+            let noteInput = document.createElement("textarea");
+            noteInput.placeholder = "Add a note or review...";
+            noteInput.rows = 3;
+            noteInput.style.cssText = "display: block; width: 100%; margin-top: 10px; border-radius: 8px; padding: 8px; border: 1px solid #ccc;";
+            div.appendChild(noteInput);
+
+            // submit note button
+            let noteButton = document.createElement("button");
+            noteButton.textContent = "Submit Note";
+            noteButton.style.cssText = "margin-top: 5px; background-color: #2196F3; color: white; padding: 8px 12px; border: none; border-radius: 8px;";
+            noteButton.onclick = function () {
+                var note = noteInput.value.trim();
+                if (note) {
+                    submitNote(name, note); // assume this is your custom function
+                    noteInput.value = ""; // clear input
+                } else {
+                    alert("Please enter a note before submitting.");
+                }
+            }
+        div.appendChild(noteButton);
+        }
        
         surroundDiv.appendChild(div);
         bookCount++;
     }
     // document.getElementById("test1").innerHTML = (bookData);
 
+}
+
+function submitNote(bookName, note) {
+     var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/addNote/", false);
+    xhttp.setRequestHeader("Content-Type", "application/json");
+    xhttp.send(JSON.stringify({
+        "book": bookName,
+        "notestr": note
+    }));
+    location.reload();
+    return xhttp.responseText;
 }
 
 function isEmpty(obj) {

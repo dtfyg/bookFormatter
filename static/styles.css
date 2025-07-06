@@ -1,0 +1,58 @@
+/* html, body {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+}
+*, *::before, *::after {
+	box-sizing: inherit;
+} */
+html, body {
+	overflow-x: hidden;
+}
+a:hover {
+	 background-color:#302856;
+}
+a {
+	background-color: black;
+}
+#filterConfirm {
+	
+	background-color: #337ab7;
+	border-style: none;
+	border-radius: 2px;
+	padding-left: 5px;
+	padding-right: 5px;
+
+	padding-top: 2px;
+	padding-bottom: 2px;
+	color: fff;
+	  
+}
+
+#filterForm {
+	border-radius: 5px;
+}
+
+.bookDivs {
+    width: 100%;
+    max-width: 2000px; 
+    margin: 0 auto;   
+    padding: 1em;
+    border: 2px solid rgb(155, 155, 237);
+    border-radius: 15px;
+    background-color: rgb(218, 232, 237);
+    box-sizing: border-box;
+}
+
+.bookDiv2 {
+    width: 100%;
+    max-width: 2000px; 
+    margin: 0 auto;   
+    padding: 1em;
+    border: 2px solid rgb(172, 209, 238);
+    border-radius: 15px;
+    background-color: rgb(172, 209, 238);
+    box-sizing: border-box;
+}
