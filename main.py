@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 from bson import json_util
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from typing import List
 client = pymongo.MongoClient("mongodb://localhost:27017/")
 dbName = client["bookData"]
 collection = dbName["books"]
@@ -153,4 +154,18 @@ class note(BaseModel):
 async def getFiltered(item: note):
   result = {"RC": 200, "note": {item.notestr}}
   collection.update_one({"name": item.book}, {"$set": {"note": item.notestr}})
+  return result
+
+class item(BaseModel):
+    books: List[str]
+@app.post("/addReadBooks/")
+async def getFiltered(item: item):
+  result = {"RC": 200, "updated": []}
+  for book_name in item.books:
+        res = collection.update_one(
+            {"name": book_name},
+            {"$set": {"read": True}}
+        )
+        if res.modified_count > 0:
+            result["updated"].append(book_name)
   return result

@@ -1,6 +1,6 @@
-amount:250|
+amount:150|
 
-rating:4.5|
+rating:4.4|
 
 page:1000|
 
