@@ -113,8 +113,18 @@ function loadFilterBooks(genres = [], pages = 0, rating = 0, read = false, sortb
     if (pages == "") {
         pages = 0;
     }
+    const filterData = {
+        genre: genres,
+        pages: pages,
+        rating: rating,
+        read: read,
+        sort_by: sortby,
+        sort_order: sortOrder,
+        bookmarked: bookmarked
+    };
+    sessionStorage.setItem("lastFilters", JSON.stringify(filterData));
     var xhttp = new XMLHttpRequest();
-    // xhttp.open("POST", "http://192.168.1.100:8000/getFilterBooks/", false);
+    
     xhttp.open("POST", "/getFilterBooks/", false);
     xhttp.setRequestHeader("Content-Type", "application/json");
     xhttp.send(JSON.stringify({ "genre": genres, "pages": pages, "rating": rating, "read": read, "sort_by": sortby, "sort_order": sortOrder, "bookmarked": bookmarked }));
@@ -133,7 +143,7 @@ function completeBook(bookName) {
     xhttp.send(JSON.stringify({ "book": bookName }));
     // console.log({"book": bookName});
     // generateBooks(xhttp.responseText);
-    location.reload();
+    reloadWithLastFilters();
     return xhttp.responseText;
 }
 
@@ -145,7 +155,7 @@ function bookmarkBook(bookName) {
     xhttp.setRequestHeader("Content-Type", "application/json");
     xhttp.send(JSON.stringify({ "book": bookName }));
     // generateBooks(xhttp.responseText);
-    location.reload();
+    reloadWithLastFilters();
     return xhttp.responseText;
 }
 
@@ -474,7 +484,7 @@ function submitNote(bookName, note) {
         "book": bookName,
         "notestr": note
     }));
-    location.reload();
+    reloadWithLastFilters();
     return xhttp.responseText;
 }
 
@@ -519,6 +529,23 @@ function formatData(data) {
         returnText += "\n" + booksData[i];
     }
     return returnText;
+}
+
+function reloadWithLastFilters() {
+    const filters = JSON.parse(sessionStorage.getItem("lastFilters"));
+    if (filters) {
+        loadFilterBooks(
+            filters.genre,
+            filters.pages,
+            filters.rating,
+            filters.read,
+            filters.sort_by,
+            filters.sort_order,
+            filters.bookmarked
+        );
+    } else {
+        loadFilterBooks(); 
+    }
 }
 
 // Function to download data to a file
