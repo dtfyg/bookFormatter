@@ -544,9 +544,15 @@ function reloadWithLastFilters() {
             filters.bookmarked
         );
     } else {
-        loadFilterBooks(); 
+        location.reload();
     }
 }
+
+ window.addEventListener("load", function () {
+    if (window.location.pathname === "/") {
+      sessionStorage.clear();
+    }
+  });
 
 // Function to download data to a file
 function download() {
